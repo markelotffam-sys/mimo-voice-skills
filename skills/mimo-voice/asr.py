@@ -15,6 +15,7 @@ import argparse
 import base64
 import json
 import os
+import platform
 import subprocess
 import sys
 import time
@@ -148,11 +149,28 @@ def main():
 
     if os.path.exists(LAST_TXT):
         os.remove(LAST_TXT)
+    script = os.path.abspath(__file__)
+    new_window = False
     if sys.platform == "win32":
-        script = os.path.abspath(__file__)
         subprocess.Popen(
             [sys.executable, script, "--_child", "--lang", args.lang],
             creationflags=subprocess.CREATE_NEW_CONSOLE)
+        new_window = True
+    elif platform.system() == "Darwin":
+        # macOS：AI 调用时当前终端无可交互 stdin，必须弹独立 Terminal 窗口
+        import shlex
+        cmd = (f"{shlex.quote(sys.executable)} {shlex.quote(script)} "
+               f"--_child --lang {args.lang}")
+        r = subprocess.run(
+            ["osascript", "-e", f'tell application "Terminal" to do script "{cmd}"'],
+            capture_output=True)
+        if r.returncode != 0:
+            raise SystemExit(
+                "❌ 无法打开录音窗口（osascript 失败）。\n"
+                "   请改用定时模式：python asr.py --seconds 8")
+        new_window = True
+
+    if new_window:
         print("🎙 已打开录音窗口，请说话；说完在那个窗口按回车。等待结果…", flush=True)
         deadline = time.time() + 300
         while time.time() < deadline:
@@ -163,7 +181,7 @@ def main():
             time.sleep(0.5)
         raise SystemExit("❌ 等待录音窗口超时（5 分钟）")
     else:
-        # macOS / Linux：当前终端交互，按回车结束
+        # Linux 交互终端等场景：当前终端直接录音，按回车结束
         wav = os.path.join(OUT_DIR, f"asr_{time.strftime('%Y%m%d_%H%M%S')}.wav")
         record_until_enter(wav)
         finish(wav, args.lang)

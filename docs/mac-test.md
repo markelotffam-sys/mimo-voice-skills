@@ -51,6 +51,7 @@ python3 ~/.claude/skills/mimo-voice/tts.py "配置测试" -o /tmp/t.wav --play
 - [ ] **语音合成**：`tts.py "今天天气不错" --play` → 有声播放
 - [ ] **风格控制**：`tts.py "测试" --style 温柔` → 成功出文件
 - [ ] **语音输入**：`asr.py --seconds 5`（让用户对着麦克风说一句）→ 文字正确、有标点
+- [ ] **弹窗模式**：`asr.py`（会弹出独立 Terminal 窗口，用户说完按回车）→ 文字正确返回
 - [ ] **文件转写**：`asr.py --file /tmp/t.wav` → 转出刚才合成的文字
 - [ ] **清理机制**：`tts.py --clean` → 正常执行
 - [ ] **（可选）视频**：需 `brew install ffmpeg`，按 `video-render` SKILL 出一支短片
