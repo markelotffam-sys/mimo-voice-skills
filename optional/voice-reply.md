@@ -1,0 +1,44 @@
+# 可选：语音简报（每轮回答自动语音总结）
+
+开启后，Claude 每次回答结束前会生成一段 ≤15 秒的语音摘要并后台播放。默认**不启用**。
+
+## 启用
+
+1. 确保 `mimo-voice` skill 已安装（`~/.claude/skills/mimo-voice/`）
+2. 在 `~/.claude/settings.json` 的顶层合并以下配置（注意保留你已有的内容）：
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/skills/mimo-voice/voice_reply_hook.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+3. 开启开关（默认不开启，运行后才生效）：
+
+```bash
+python ~/.claude/skills/mimo-voice/voice_reply_switch.py on
+```
+
+4. 重启 Claude Code 或在会话里敲一次 `/hooks` 重载配置。
+
+## 关闭 / 切换
+
+```bash
+python ~/.claude/skills/mimo-voice/voice_reply_switch.py off     # 关
+python ~/.claude/skills/mimo-voice/voice_reply_switch.py toggle  # 切换
+python ~/.claude/skills/mimo-voice/voice_reply_switch.py status  # 查看
+```
+
+开关关掉后钩子静默不注入，不用改 settings.json。
