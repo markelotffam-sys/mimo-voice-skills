@@ -66,6 +66,10 @@ python3 ~/.claude/skills/mimo-voice/tts.py "配置测试" -o /tmp/t.wav --play
 结论：可用 / 需修复（列出问题）
 ```
 
+**测试结束后必须做**：把上述结果写入 `docs/mac-report.md`，连同你对代码的任何修复一起 commit 并 push 到本仓库（commit message 写明改了什么），供 Windows 端另一 AI 晚间 pull 复核。注意：push 不能包含任何 Key。
+
+> 访问私有仓库需要 GitHub 认证：若 git clone/push 要求登录，让用户先跑 `gh auth login`，或提供一个有 repo 权限的 PAT。
+
 ## 给用户的开场白（可直接复制发给 Mac 端 AI）
 
 ```
