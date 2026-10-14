@@ -4,7 +4,7 @@
 MiMo 语音输入 —— 录音并转文字（MiMo-V2.5-ASR）
 
 用法：
-    python asr.py                # 弹出录音浮窗（macOS）/录音终端（Windows），点停止/按回车结束
+    python asr.py                # 弹出「MiMo 听写」对话框，说完点「停止录音」（双端一致）
     python asr.py --seconds 8    # 直接录 8 秒（不弹窗，适合自动化调用）
     python asr.py --file x.wav   # 转写已有音频文件（wav/mp3）
     python asr.py --lang en      # 指定语种 zh/en/auto（默认 zh）
@@ -88,11 +88,59 @@ def record_timed(seconds, path, samplerate=16000):
     print("⏹ 录音结束", flush=True)
 
 
+def _stop_dialog_win(timeout=300):
+    """Windows：PowerShell WinForms 对话框（与 macOS 对话框同标题同按钮）。
+    ps1 用 UTF-8-BOM 写入，避免中文在 PowerShell 5.1 下乱码。"""
+    ps1 = os.path.join(OUT_DIR, "_asr_stop_dialog.ps1")
+    script = """Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "MiMo 听写"
+$form.TopMost = $true
+$form.FormBorderStyle = "FixedDialog"
+$form.MaximizeBox = $false
+$form.MinimizeBox = $false
+$form.StartPosition = "CenterScreen"
+$form.ClientSize = New-Object System.Drawing.Size(330, 150)
+$lbl = New-Object System.Windows.Forms.Label
+$lbl.Text = "正在录音...`n说完点「停止录音」"
+$lbl.AutoSize = $true
+$lbl.Location = New-Object System.Drawing.Point(36, 22)
+$form.Controls.Add($lbl)
+$btn = New-Object System.Windows.Forms.Button
+$btn.Text = "停止录音"
+$btn.Size = New-Object System.Drawing.Size(130, 38)
+$btn.Location = New-Object System.Drawing.Point(100, 82)
+$btn.Add_Click({ $form.Close() })
+$form.Controls.Add($btn)
+$timer = New-Object System.Windows.Forms.Timer
+$timer.Interval = __MS__
+$timer.Add_Tick({ $form.Close() })
+$timer.Start()
+$form.ShowDialog() | Out-Null
+""".replace("__MS__", str(int(timeout * 1000)))
+    with open(ps1, "w", encoding="utf-8-sig") as f:
+        f.write(script)
+    try:
+        r = subprocess.run(
+            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ps1],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=timeout + 30)
+        if r.returncode != 0:
+            # 对话框根本没弹出来（脚本/环境问题）→ 抛错走兜底，别让录音失控
+            raise RuntimeError("WinForms 对话框启动失败")
+    finally:
+        try:
+            os.remove(ps1)
+        except OSError:
+            pass
+
+
 def record_dialog(path, samplerate=16000):
-    """macOS：系统对话框当「停止录音」按钮，录音在本进程进行。
+    """系统对话框当「停止录音」按钮，录音在本进程进行。双端同体验：
+    macOS 用 osascript display dialog，Windows 用 PowerShell WinForms。
     - Tk 浮窗与 sounddevice 共存会冻死事件循环（点不动关不掉），弃用
-    - Terminal 弹窗的 close 会撞上「终止进程」确认框 → 窗口永久残留，弃用
-    原生 display dialog 由系统绘制，天然可靠；点停止/关闭/Esc/超时都结束录音。"""
+    - macOS Terminal 弹窗的 close 会撞「终止进程」确认框 → 窗口永久残留，弃用
+    点停止 / 关闭 / Esc / 5 分钟超时，均结束录音并转写。"""
     _require_sounddevice()
     import sounddevice as sd
 
@@ -104,11 +152,14 @@ def record_dialog(path, samplerate=16000):
     stream = sd.InputStream(samplerate=samplerate, channels=1, dtype="int16", callback=cb)
     stream.start()
     try:
-        subprocess.run(
-            ["osascript", "-e",
-             'display dialog "正在录音…\n说完点「停止录音」" with title "MiMo 听写" '
-             'buttons {"停止录音"} default button 1 giving up after 300'],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=320)
+        if sys.platform == "win32":
+            _stop_dialog_win()
+        else:
+            subprocess.run(
+                ["osascript", "-e",
+                 'display dialog "正在录音…\n说完点「停止录音」" with title "MiMo 听写" '
+                 'buttons {"停止录音"} default button 1 giving up after 300'],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=320)
     except subprocess.TimeoutExpired:
         pass
     finally:
@@ -185,44 +236,38 @@ def main():
 
     if os.path.exists(LAST_TXT):
         os.remove(LAST_TXT)
-    if platform.system() == "Darwin":
-        # macOS：tkinter 浮窗，自开自关。勿用 Terminal 弹窗——macOS 26 上
-        # AppleScript close 遇「终止进程」确认框静默失败，窗口会永久残留。
-        wav = os.path.join(OUT_DIR, f"asr_{time.strftime('%Y%m%d_%H%M%S')}.wav")
+    wav = os.path.join(OUT_DIR, f"asr_{time.strftime('%Y%m%d_%H%M%S')}.wav")
+    if platform.system() == "Darwin" or sys.platform == "win32":
+        # 双端统一体验：系统对话框「停止录音」按钮 + 本进程录音。
         try:
             record_dialog(wav)
         except SystemExit:
             raise
         except Exception as e:
+            if sys.platform == "win32":
+                # 兜底：旧控制台窗口 + 回车（体验不一致但可靠）
+                script = os.path.abspath(__file__)
+                subprocess.Popen(
+                    [sys.executable, script, "--_child", "--lang", args.lang],
+                    creationflags=subprocess.CREATE_NEW_CONSOLE)
+                print(f"🎙 对话框启动失败（{e}），已回退控制台窗口；说完按回车…", flush=True)
+                deadline = time.time() + 300
+                while time.time() < deadline:
+                    if os.path.exists(LAST_TXT):
+                        time.sleep(0.3)
+                        print(open(LAST_TXT, encoding="utf-8").read())
+                        return
+                    time.sleep(0.5)
+                raise SystemExit("❌ 等待录音窗口超时（5 分钟）")
             raise SystemExit(
                 f"❌ 弹窗录音失败：{e}\n"
                 "   请改用定时模式：python3 asr.py --seconds 8")
         finish(wav, args.lang)
         return
 
-    script = os.path.abspath(__file__)
-    new_window = False
-    if sys.platform == "win32":
-        subprocess.Popen(
-            [sys.executable, script, "--_child", "--lang", args.lang],
-            creationflags=subprocess.CREATE_NEW_CONSOLE)
-        new_window = True
-
-    if new_window:
-        print("🎙 已打开录音窗口，请说话；说完在那个窗口按回车。等待结果…", flush=True)
-        deadline = time.time() + 300
-        while time.time() < deadline:
-            if os.path.exists(LAST_TXT):
-                time.sleep(0.3)
-                print(open(LAST_TXT, encoding="utf-8").read())
-                return
-            time.sleep(0.5)
-        raise SystemExit("❌ 等待录音窗口超时（5 分钟）")
-    else:
-        # Linux 交互终端等场景：当前终端直接录音，按回车结束
-        wav = os.path.join(OUT_DIR, f"asr_{time.strftime('%Y%m%d_%H%M%S')}.wav")
-        record_until_enter(wav)
-        finish(wav, args.lang)
+    # Linux 交互终端等场景：当前终端直接录音，按回车结束
+    record_until_enter(wav)
+    finish(wav, args.lang)
 
 
 if __name__ == "__main__":

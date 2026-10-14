@@ -44,7 +44,7 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 
 ## 使用
 
-- **语音输入**：对 AI 说「听」（或「听写」），弹出录音浮窗（macOS）或录音终端（Windows），说完点「停止录音」/按回车，内容变成你的消息
+- **语音输入**：对 AI 说「听」（或「听写」），弹出「MiMo 听写」对话框，说完点「停止录音」，内容变成你的消息（macOS / Windows 体验一致）
 - **语音合成**：说「读给我听：……」，后台无窗口播放；「给这几句做配音」生成 wav 文件
 - **视频**：说「做个 XX 的介绍视频」，自动生成分镜 + 旁白 + 1080p MP4（依赖 ffmpeg）
 - 命令行直用：`python3 ~/.claude/skills/mimo-voice/tts.py --help` / `asr.py --help`
