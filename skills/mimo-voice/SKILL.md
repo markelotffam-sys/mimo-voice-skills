@@ -45,7 +45,7 @@ python3 ~/.claude/skills/mimo-voice/asr.py --lang en      # zh/en/auto，默认 
 | 转写会议录音等已有文件 | `--file`；超 10MB 先用 ffmpeg 压 16kHz 单声道 |
 | 方言/中英混说 | 默认 zh 即可；混说用 `--lang auto` |
 
-弹窗模式新开控制台（Windows）或当前终端交互（macOS），用户说完按回车，脚本等待并返回文字。
+弹窗模式：双端均弹「MiMo 听写」系统对话框（macOS 用 osascript、Windows 用 WinForms），说完点「停止录音」（或关窗 / 5 分钟超时）即结束并返回文字；Windows 对话框启动失败会自动回退「控制台窗口按回车」。
 
 ## 缓存清理（自动）
 
@@ -66,3 +66,4 @@ python3 ~/.claude/skills/mimo-voice/asr.py --lang en      # zh/en/auto，默认 
 | 录音报缺 sounddevice / numpy | `pip install sounddevice numpy`（numpy 是 sounddevice 录音的隐式依赖） |
 | 播放没声音 | 装 ffmpeg（Mac: `brew install ffmpeg`，无 Homebrew 可 `pip install imageio-ffmpeg` 并软链其 ffmpeg）；wav 仍会生成 |
 | 控制台中文乱码 | 脚本已强制 UTF-8；仍乱码就 `PYTHONUTF8=1` |
+| 录不到音 | 检查系统麦克风权限（macOS：隐私与安全性→麦克风；Windows：隐私→麦克风）；可用 `--seconds 3` 自测 |

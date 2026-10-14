@@ -8,6 +8,7 @@ description: 代码渲染视频：用 Python+Pillow 逐帧绘制 + ffmpeg 合成
 Python(Pillow) 画帧 → MiMo TTS 旁白 → ffmpeg 合成 MP4。全程本地代码渲染，无 AI 生视频。
 
 > 依赖：`pip install Pillow`（画帧）+ ffmpeg（合成）；TTS 部分复用 mimo-voice 的 Key 配置（`~/.config/mimo-tts/`）。
+> 下文命令用 `python3`（macOS/Linux）；Windows 换 `python`（或 `py -3`）。
 
 ## 工作流（依次执行，不要跳步）
 
@@ -30,7 +31,7 @@ Python(Pillow) 画帧 → MiMo TTS 旁白 → ffmpeg 合成 MP4。全程本地�
 
 ```bash
 cd <工作目录>          # 所有产物放独立工作目录，别混进用户项目
-PYTHONUTF8=1 python make_video.py        # 出 frames/ + narration.wav
+PYTHONUTF8=1 python3 make_video.py       # 出 frames/ + narration.wav（Windows 用 python）
 <ffmpeg> -y -framerate 24 -i frames/%05d.png -i narration.wav \
   -c:v libx264 -pix_fmt yuv420p -crf 20 -preset medium \
   -c:a aac -b:a 192k -movflags +faststart 输出.mp4

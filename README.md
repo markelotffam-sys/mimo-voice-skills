@@ -40,7 +40,7 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 
 > `setup.py` 会把 `tts.py` 播报命令写进 `~/.claude/settings.json` 的 `permissions.allow` 免确认白名单，否则每次语音播报都会弹权限确认。
 
-依赖：Python ≥ 3.8；`sounddevice` + `numpy`（录音，setup.py 会装）；`ffplay` 或 `afplay`（播放，Mac 自带 afplay）。
+依赖：Python ≥ 3.8；`sounddevice` + `numpy`（录音，setup.py 会装）；`Pillow`（视频画帧，`pip install Pillow`）；播放用 `ffplay`/`afplay`（Mac 自带 afplay；Windows 无 ffmpeg 时自动用系统 SoundPlayer 兜底）。
 
 ## 使用
 
@@ -57,9 +57,10 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 
 语音文件统一在 `~/tts-output/`，自动三层清理：**3 天**过期 + 最多 **30 个** + 合计 **100MB** 封顶，无需手动维护。
 
-## Mac 测试要点
+## 测试与复核
 
-见 [docs/mac-test.md](docs/mac-test.md)。
+- Mac 端测试指引与报告：[docs/mac-test.md](docs/mac-test.md)、[docs/mac-report.md](docs/mac-report.md)
+- Windows 端复核记录：`docs/win-report.md`（Windows 侧产出）
 
 ## FAQ
 
@@ -70,3 +71,5 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 | 录音报缺 sounddevice / numpy | `pip install sounddevice numpy` |
 | 播放没声音但 wav 已生成 | 装 ffmpeg（Mac: `brew install ffmpeg`，无 Homebrew 可 `pip install imageio-ffmpeg` 后把其 ffmpeg 软链到 PATH） |
 | 中文乱码 | `PYTHONUTF8=1` 前缀运行；脚本已内置 UTF-8 修复 |
+| 录不到音 / 麦克风没反应 | macOS：系统设置 → 隐私与安全性 → 麦克风，允许调用方（Code/终端/Python）；Windows：设置 → 隐私 → 麦克风打开 |
+| 听写对话框没弹出来 | 看输出里的报错，会自动回退方案（Windows 回退控制台按回车）；或用 `--seconds 8` 定时录 |
