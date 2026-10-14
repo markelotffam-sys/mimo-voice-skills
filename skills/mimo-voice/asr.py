@@ -113,6 +113,7 @@ $btn.Size = New-Object System.Drawing.Size(130, 38)
 $btn.Location = New-Object System.Drawing.Point(100, 82)
 $btn.Add_Click({ $form.Close() })
 $form.Controls.Add($btn)
+$form.CancelButton = $btn  # Esc = 点「停止录音」（与 macOS 对话框 Esc 关闭对齐）
 $timer = New-Object System.Windows.Forms.Timer
 $timer.Interval = __MS__
 $timer.Add_Tick({ $form.Close() })

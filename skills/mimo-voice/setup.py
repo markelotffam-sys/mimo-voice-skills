@@ -67,17 +67,28 @@ def main():
 
     step(4, "配置 API Key（仅保存到本机）")
     print("  Key 获取：platform.xiaomimimo.com 控制台创建（详见 README）")
-    key = getpass.getpass("  请粘贴你的 API Key（输入不回显）: ").strip()
-    if not key:
-        raise SystemExit("❌ 未输入 Key，退出")
-    os.makedirs(CONFIG_DIR, exist_ok=True)
-    with open(KEY_FILE, "w", encoding="utf-8") as f:
-        f.write(key)
+    existing = ""
     try:
-        os.chmod(KEY_FILE, 0o600)
+        with open(KEY_FILE, encoding="utf-8") as f:
+            existing = f.read().strip()
     except OSError:
-        pass  # Windows 不支持 Unix 权限位，文件本身仅本机可见
-    print(f"  ✅ 已保存到 {KEY_FILE}")
+        pass
+    if existing:
+        print("  （已检测到已保存的 Key）直接回车保留原 Key，或输入新 Key 覆盖")
+    key = getpass.getpass("  请粘贴你的 API Key（输入不回显）: ").strip()
+    if not key and existing:
+        print("  ✅ 已保留原 Key")
+    elif not key:
+        raise SystemExit("❌ 未输入 Key，退出")
+    else:
+        os.makedirs(CONFIG_DIR, exist_ok=True)
+        with open(KEY_FILE, "w", encoding="utf-8") as f:
+            f.write(key)
+        try:
+            os.chmod(KEY_FILE, 0o600)
+        except OSError:
+            pass  # Windows 不支持 Unix 权限位，文件本身仅本机可见
+        print(f"  ✅ 已保存到 {KEY_FILE}")
 
     step(5, "选择 API 网关")
     for k, (name, url) in GATEWAYS.items():
@@ -88,7 +99,14 @@ def main():
         base = GATEWAYS[choice][1]
     else:
         base = input("  请输入网关地址: ").strip().rstrip("/")
-    cfg = {"api_base": base}
+    cfg = {}
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, encoding="utf-8") as f:
+                cfg = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            cfg = {}
+    cfg["api_base"] = base  # 合并更新，保留 style/voice 等既有偏好
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(cfg, f, ensure_ascii=False, indent=2)
     print(f"  ✅ 网关已保存：{base}")
