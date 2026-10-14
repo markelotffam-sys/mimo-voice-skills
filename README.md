@@ -74,3 +74,7 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 | 中文乱码 | `PYTHONUTF8=1` 前缀运行；脚本已内置 UTF-8 修复 |
 | 录不到音 / 麦克风没反应 | macOS：系统设置 → 隐私与安全性 → 麦克风，允许调用方（Code/终端/Python）；Windows：设置 → 隐私 → 麦克风打开 |
 | 听写对话框没弹出来 | 看输出里的报错，会自动回退方案（Windows 回退控制台按回车）；或用 `--seconds 8` 定时录 |
+
+## 许可证
+
+[MIT](LICENSE)
