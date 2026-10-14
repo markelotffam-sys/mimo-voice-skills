@@ -21,9 +21,18 @@
         ]
       }
     ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python3 ~/.claude/skills/mimo-voice/tts.py *)",
+      "Bash(python ~/.claude/skills/mimo-voice/tts.py *)",
+      "Bash(py -3 ~/.claude/skills/mimo-voice/tts.py *)"
+    ]
   }
 }
 ```
+
+> `permissions.allow` 是免确认白名单：没有它，每轮语音播报都会弹权限确认（摘要文本每次不同，「总是允许」也按命令文本匹配，覆盖不到下一条）。`setup.py` 第 7 步会自动写入这三条；手动配置时别漏掉。
 
 3. 开启开关（默认不开启，运行后才生效）：
 

@@ -106,6 +106,35 @@ def main():
         print("  常见原因：Key 错误 / 选错网关（Token Plan 的 Key 需选 Token Plan 网关）")
         return
 
+    step(7, "配置 Claude Code 权限白名单（免去每次播报弹确认）")
+    try:
+        settings = os.path.expanduser("~/.claude/settings.json")
+        if os.path.exists(settings):
+            with open(settings, encoding="utf-8") as f:
+                conf = json.load(f)
+        else:
+            conf = {}
+        allow = conf.setdefault("permissions", {}).setdefault("allow", [])
+        # 覆盖 macOS/Linux（python3）与 Windows（python / py -3）三种命令名
+        rules = [
+            "Bash(python3 ~/.claude/skills/mimo-voice/tts.py *)",
+            "Bash(python ~/.claude/skills/mimo-voice/tts.py *)",
+            "Bash(py -3 ~/.claude/skills/mimo-voice/tts.py *)",
+            "Bash(python3 ~/.claude/skills/mimo-voice/voice_reply_switch.py *)",
+            "Bash(python ~/.claude/skills/mimo-voice/voice_reply_switch.py *)",
+        ]
+        added = [r for r in rules if r not in allow]
+        if added:
+            allow.extend(added)
+            with open(settings, "w", encoding="utf-8") as f:
+                json.dump(conf, f, ensure_ascii=False, indent=2)
+            print(f"  ✅ 已写入 {len(added)} 条 allow 规则 → {settings}")
+        else:
+            print("  ✅ allow 规则已存在，跳过")
+        print("  （否则每次 tts.py 播报都会弹权限确认）")
+    except Exception as e:
+        print(f"  ⚠️ 自动写入失败（可手动添加）：{e}")
+
     print("\n" + "=" * 56)
     print("  ✅ 配置完成！接下来安装 skill：")
     print("  1. 把 skills/ 下的两个文件夹复制到 ~/.claude/skills/")

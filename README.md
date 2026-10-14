@@ -32,11 +32,13 @@
 # 1. 把两个 skill 复制到 Claude Code 的技能目录
 cp -r skills/* ~/.claude/skills/
 
-# 2. 首次配置（交互式向导：装依赖 → 输入 Key → 选网关 → 连通测试）
+# 2. 首次配置（交互式向导：装依赖 → 输入 Key → 选网关 → 连通测试 → 写权限白名单）
 python3 ~/.claude/skills/mimo-voice/setup.py
 
 # 3. 重启 Claude Code（或新开会话）
 ```
+
+> `setup.py` 会把 `tts.py` 播报命令写进 `~/.claude/settings.json` 的 `permissions.allow` 免确认白名单，否则每次语音播报都会弹权限确认。
 
 依赖：Python ≥ 3.8；`sounddevice` + `numpy`（录音，setup.py 会装）；`ffplay` 或 `afplay`（播放，Mac 自带 afplay）。
 
