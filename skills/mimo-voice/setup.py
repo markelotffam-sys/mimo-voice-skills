@@ -101,7 +101,7 @@ def main():
         out = os.path.join(tts.OUT_DIR, "setup_test.wav")
         dur = tts.synth("配置成功，语音工具箱已就绪。", out)
         print(f"  ✅ 语音合成正常（{dur:.1f} 秒）→ {out}")
-    except Exception as e:
+    except (Exception, SystemExit) as e:  # synth 的 API 报错是 SystemExit
         print(f"  ❌ 测试失败：{e}")
         print("  常见原因：Key 错误 / 选错网关（Token Plan 的 Key 需选 Token Plan 网关）")
         return

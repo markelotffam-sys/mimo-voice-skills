@@ -19,7 +19,7 @@ FLAG = os.path.expanduser("~/.config/mimo-tts/voice_reply.on")
 def _touch_flag():
     """创建开关文件；目标目录可能还不存在（全新机器），先建目录"""
     os.makedirs(os.path.dirname(FLAG), exist_ok=True)
-    _touch_flag()
+    open(FLAG, "w").close()
 
 
 def state():

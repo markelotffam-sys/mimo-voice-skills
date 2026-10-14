@@ -45,7 +45,8 @@ PRUNE_MAX_TOTAL_MB = 100
 
 def synth(text, out_path, voice=None, style=None):
     voice = voice or get_pref("voice", "冰糖")
-    style_text = PRESETS.get(style or DEFAULT_STYLE, style or get_pref("style") or PRESETS[DEFAULT_STYLE])
+    style = style or get_pref("style")  # --style 未给时读 config.json 偏好
+    style_text = PRESETS.get(style or DEFAULT_STYLE) or style or PRESETS[DEFAULT_STYLE]
     body = {
         "model": MODEL,
         "messages": [
