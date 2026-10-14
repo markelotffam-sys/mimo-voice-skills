@@ -37,8 +37,7 @@ PYTHONUTF8=1 python3 make_video.py       # 出 frames/ + narration.wav（Windows
   -c:a aac -b:a 192k -movflags +faststart 输出.mp4
 ```
 
-ffmpeg 路径探测顺序：PATH 里的 `ffmpeg` → winget 安装路径（Windows）；Mac 无 Homebrew 可 `pip install imageio-ffmpeg` 并把其 ffmpeg 软链到 `~/.local/bin/ffmpeg`（实测可用，含 libx264/aac）
-`%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg_*\ffmpeg-*\bin\ffmpeg.exe`
+ffmpeg 路径探测顺序：PATH 里的 `ffmpeg` → winget 安装路径（Windows，形如 `%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg_*\ffmpeg-*\bin\ffmpeg.exe`）；Mac 无 Homebrew 可 `pip install imageio-ffmpeg` 并把其 ffmpeg 软链到 `~/.local/bin/ffmpeg`（实测可用，含 libx264/aac）
 
 ### Step 4：验证再交付
 

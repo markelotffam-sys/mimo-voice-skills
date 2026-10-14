@@ -38,7 +38,9 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 # 3. 重启 Claude Code（或新开会话）
 ```
 
-> `setup.py` 会把 `tts.py` 播报命令写进 `~/.claude/settings.json` 的 `permissions.allow` 免确认白名单，否则每次语音播报都会弹权限确认。
+> 本文命令中的 `python3` 是 macOS/Linux 写法；**Windows 用 `python`（或 `py -3`）**，下同。
+
+> `setup.py` 会把 `tts.py` 播报与 `voice_reply_switch.py` 开关命令写进 `~/.claude/settings.json` 的 `permissions.allow` 免确认白名单，否则每次语音播报都会弹权限确认。
 
 依赖：Python ≥ 3.8；`sounddevice` + `numpy`（录音，setup.py 会装）；`Pillow`（视频画帧，`pip install Pillow`）；播放用 `ffplay`/`afplay`（Mac 自带 afplay；Windows 无 ffmpeg 时自动用系统 SoundPlayer 兜底）。
 
