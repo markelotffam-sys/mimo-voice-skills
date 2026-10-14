@@ -32,7 +32,7 @@ python3 ~/.claude/skills/mimo-voice/tts.py --list
 ## 语音输入（asr.py）
 
 ```bash
-python3 ~/.claude/skills/mimo-voice/asr.py                # 弹录音窗，说完按回车
+python3 ~/.claude/skills/mimo-voice/asr.py                # 弹录音浮窗（macOS 点「停止录音」；Windows 终端按回车）
 python3 ~/.claude/skills/mimo-voice/asr.py --seconds 8    # 定时录 8 秒（不弹窗）
 python3 ~/.claude/skills/mimo-voice/asr.py --file x.wav   # 转写已有音频
 python3 ~/.claude/skills/mimo-voice/asr.py --lang en      # zh/en/auto，默认 zh

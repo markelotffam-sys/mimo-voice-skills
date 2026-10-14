@@ -4,7 +4,7 @@
 MiMo 语音输入 —— 录音并转文字（MiMo-V2.5-ASR）
 
 用法：
-    python asr.py                # 弹出录音窗口，说完按回车结束，返回文字
+    python asr.py                # 弹出录音浮窗（macOS）/录音终端（Windows），点停止/按回车结束
     python asr.py --seconds 8    # 直接录 8 秒（不弹窗，适合自动化调用）
     python asr.py --file x.wav   # 转写已有音频文件（wav/mp3）
     python asr.py --lang en      # 指定语种 zh/en/auto（默认 zh）
@@ -88,6 +88,36 @@ def record_timed(seconds, path, samplerate=16000):
     print("⏹ 录音结束", flush=True)
 
 
+def record_dialog(path, samplerate=16000):
+    """macOS：系统对话框当「停止录音」按钮，录音在本进程进行。
+    - Tk 浮窗与 sounddevice 共存会冻死事件循环（点不动关不掉），弃用
+    - Terminal 弹窗的 close 会撞上「终止进程」确认框 → 窗口永久残留，弃用
+    原生 display dialog 由系统绘制，天然可靠；点停止/关闭/Esc/超时都结束录音。"""
+    _require_sounddevice()
+    import sounddevice as sd
+
+    frames = []
+
+    def cb(indata, _f, _t, _s):
+        frames.append(indata.copy())
+
+    stream = sd.InputStream(samplerate=samplerate, channels=1, dtype="int16", callback=cb)
+    stream.start()
+    try:
+        subprocess.run(
+            ["osascript", "-e",
+             'display dialog "正在录音…\n说完点「停止录音」" with title "MiMo 听写" '
+             'buttons {"停止录音"} default button 1 giving up after 300'],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=320)
+    except subprocess.TimeoutExpired:
+        pass
+    finally:
+        stream.stop()
+        stream.close()
+    save_wav([f.tobytes() for f in frames], samplerate, path)
+    print("⏹ 录音结束", flush=True)
+
+
 def record_until_enter(path, samplerate=16000):
     _require_sounddevice()
     import sounddevice as sd
@@ -155,25 +185,27 @@ def main():
 
     if os.path.exists(LAST_TXT):
         os.remove(LAST_TXT)
+    if platform.system() == "Darwin":
+        # macOS：tkinter 浮窗，自开自关。勿用 Terminal 弹窗——macOS 26 上
+        # AppleScript close 遇「终止进程」确认框静默失败，窗口会永久残留。
+        wav = os.path.join(OUT_DIR, f"asr_{time.strftime('%Y%m%d_%H%M%S')}.wav")
+        try:
+            record_dialog(wav)
+        except SystemExit:
+            raise
+        except Exception as e:
+            raise SystemExit(
+                f"❌ 弹窗录音失败：{e}\n"
+                "   请改用定时模式：python3 asr.py --seconds 8")
+        finish(wav, args.lang)
+        return
+
     script = os.path.abspath(__file__)
     new_window = False
     if sys.platform == "win32":
         subprocess.Popen(
             [sys.executable, script, "--_child", "--lang", args.lang],
             creationflags=subprocess.CREATE_NEW_CONSOLE)
-        new_window = True
-    elif platform.system() == "Darwin":
-        # macOS：AI 调用时当前终端无可交互 stdin，必须弹独立 Terminal 窗口
-        import shlex
-        cmd = (f"{shlex.quote(sys.executable)} {shlex.quote(script)} "
-               f"--_child --lang {args.lang}")
-        r = subprocess.run(
-            ["osascript", "-e", f'tell application "Terminal" to do script "{cmd}"'],
-            capture_output=True)
-        if r.returncode != 0:
-            raise SystemExit(
-                "❌ 无法打开录音窗口（osascript 失败）。\n"
-                "   请改用定时模式：python asr.py --seconds 8")
         new_window = True
 
     if new_window:
