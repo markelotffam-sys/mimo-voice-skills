@@ -176,12 +176,6 @@ def wav_duration(path):
         return w.getnframes() / w.getframerate()
 
 # ---------------- 绘制 ----------------
-def draw_item(draw, item, t, total_hint):
-    kind, payload = item
-    alpha = (t - item_appear.get(id(item), 0)) / 0.45
-    # appear 由外层传入处理, 这里 alpha 直接用 t-draw 逻辑外面算好? 简化: 在 render 里算
-    return
-
 def fade_text(draw, xy, text, fnt, color, alpha, anchor=None):
     alpha = max(0.0, min(1.0, alpha))
     c = mix(BG, color, alpha)

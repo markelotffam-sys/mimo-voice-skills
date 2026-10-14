@@ -16,6 +16,11 @@ if sys.platform == "win32":
 
 FLAG = os.path.expanduser("~/.config/mimo-tts/voice_reply.on")
 
+def _touch_flag():
+    """创建开关文件；目标目录可能还不存在（全新机器），先建目录"""
+    os.makedirs(os.path.dirname(FLAG), exist_ok=True)
+    _touch_flag()
+
 
 def state():
     return "开" if os.path.exists(FLAG) else "关"
@@ -23,7 +28,7 @@ def state():
 
 cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
 if cmd == "on":
-    open(FLAG, "w").close()
+    _touch_flag()
 elif cmd == "off":
     if os.path.exists(FLAG):
         os.remove(FLAG)
@@ -31,7 +36,7 @@ elif cmd == "toggle":
     if os.path.exists(FLAG):
         os.remove(FLAG)
     else:
-        open(FLAG, "w").close()
+        _touch_flag()
 elif cmd != "status":
     print(__doc__)
     sys.exit(1)

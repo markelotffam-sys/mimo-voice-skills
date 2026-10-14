@@ -33,10 +33,11 @@ LAST_TXT = os.path.join(OUT_DIR, "asr_last.txt")
 
 def transcribe(wav_path, lang="zh"):
     audio = base64.b64encode(open(wav_path, "rb").read()).decode()
+    mime = "audio/mpeg" if str(wav_path).lower().endswith(".mp3") else "audio/wav"  # 别把 mp3 硬标成 wav
     body = {
         "model": MODEL,
         "messages": [{"role": "user", "content": [
-            {"type": "input_audio", "input_audio": {"data": f"data:audio/wav;base64,{audio}"}}]}],
+            {"type": "input_audio", "input_audio": {"data": f"data:{mime};base64,{audio}"}}]}],
         "asr_options": {"language": lang},
     }
     req = urllib.request.Request(

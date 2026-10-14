@@ -32,3 +32,13 @@
 ## 结论
 
 **可用**。Token Plan 网关下 TTS/ASR 全链路正常。Windows 端复核时建议重点确认：numpy 补丁后 `setup.py` 全流程、以及视频渲染项（需 ffmpeg）。
+
+## 复查补记（2026-10-14 二次审查）
+
+信息泄漏 / 安全扫描全绿（无 eval、exec、shell=True、pickle；外联仅小米网关与 GitHub；全文无 Key / 个人邮箱 / 主机名；git 历史作者均为 noreply）。复查另发现并修复 3 个兼容性问题：
+
+1. **Windows 的 `python3` 命令名**（已修）：python.org 的 Windows 安装包只提供 `python.exe`，文档统一改 `python3` 会弄坏 Windows 端。现改为 `python3` 为主、显式注明 Windows 用 `python`（或 `py -3`），hook 命令同理。
+2. **`voice_reply_switch.py` 缺 `os.makedirs`**（已修）：全新机器 `~/.config/mimo-tts/` 不存在时开开关会 FileNotFoundError；现在自动建目录。
+3. **`asr.py --file` mp3 MIME 硬编码**（已修）：转写 mp3 时曾标成 `audio/wav`，现按扩展名选 `audio/mpeg`/`audio/wav`。
+
+另清理：视频模板死函数 `draw_item`（引用未定义 `item_appear`，被复制调用会 NameError）已删除；`mac-test.md` 写 Key 改 heredoc（避免 echo 进 shell 历史）；README / video-render SKILL.md 补 Pillow 依赖、imageio-ffmpeg 替代方案、macOS 字体回退说明。

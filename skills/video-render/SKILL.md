@@ -7,6 +7,8 @@ description: 代码渲染视频：用 Python+Pillow 逐帧绘制 + ffmpeg 合成
 
 Python(Pillow) 画帧 → MiMo TTS 旁白 → ffmpeg 合成 MP4。全程本地代码渲染，无 AI 生视频。
 
+> 依赖：`pip install Pillow`（画帧）+ ffmpeg（合成）；TTS 部分复用 mimo-voice 的 Key 配置（`~/.config/mimo-tts/`）。
+
 ## 工作流（依次执行，不要跳步）
 
 ### Step 1：设计分镜
@@ -34,7 +36,7 @@ PYTHONUTF8=1 python make_video.py        # 出 frames/ + narration.wav
   -c:a aac -b:a 192k -movflags +faststart 输出.mp4
 ```
 
-ffmpeg 路径探测顺序：PATH 里的 `ffmpeg` → winget 安装路径
+ffmpeg 路径探测顺序：PATH 里的 `ffmpeg` → winget 安装路径（Windows）；Mac 无 Homebrew 可 `pip install imageio-ffmpeg` 并把其 ffmpeg 软链到 `~/.local/bin/ffmpeg`（实测可用，含 libx264/aac）
 `%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg_*\ffmpeg-*\bin\ffmpeg.exe`
 
 ### Step 4：验证再交付
@@ -57,7 +59,7 @@ ffmpeg 路径探测顺序：PATH 里的 `ffmpeg` → winget 安装路径
 ## 设计默认值（可按需覆盖）
 
 - 1920×1080 / 24fps / 深色底（RGB 15,23,42）+ 飞书蓝点缀（86,140,255）
-- 字体：`C:/Windows/Fonts/msyhbd.ttc`（粗）/ `msyh.ttc`（常规）；Mac 换 `PingFang.ttc`
+- 字体：Windows 用 `C:/Windows/Fonts/msyhbd.ttc`（粗）/ `msyh.ttc`（常规）；macOS 优先 `PingFang.ttc`，无则回退 STHeiti（模板已按平台自动选择，macOS 26 实测只有 STHeiti 可用）
 - 旁白风格默认「解说」（磁性、连贯、语速偏快）；换风格改 `STYLE`，音色改 `VOICE`
 - 底部细进度条；场景切换直接切（不做转场特效）
 

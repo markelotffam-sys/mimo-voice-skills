@@ -26,7 +26,9 @@ pip3 install sounddevice numpy
 ```bash
 mkdir -p ~/.config/mimo-tts
 # 把用户提供的 Key 写入下面文件（不要打印到对话里）
-echo "USER_PROVIDED_KEY" > ~/.config/mimo-tts/mimo_key.txt
+cat > ~/.config/mimo-tts/mimo_key.txt <<'EOF'
+USER_PROVIDED_KEY
+EOF  # 优先用文件写入工具直接写；避免 echo 使 Key 进 shell 历史/进程列表
 # Token Plan 用户写 Token Plan 网关；普通 API 用户写官方网关
 echo '{"api_base": "https://token-plan-cn.xiaomimimo.com/v1"}' > ~/.config/mimo-tts/config.json
 ```

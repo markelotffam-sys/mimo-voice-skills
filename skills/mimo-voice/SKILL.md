@@ -9,11 +9,13 @@ description: 语音合成/朗读/配音/语音输入：文本转语音（MiMo-V2
 
 ## 语音合成（tts.py）
 
+> 下文命令用 `python3`（macOS/Linux）；Windows 换 `python`（或 `py -3`）。仅 Windows cmd 需注意，PowerShell 通常两者皆可。
+
 ```bash
-python ~/.claude/skills/mimo-voice/tts.py "文本" -o out.wav --play
-python ~/.claude/skills/mimo-voice/tts.py --file 长文本.txt -o out.wav
-python ~/.claude/skills/mimo-voice/tts.py "文本" --voice 苏打 --style 沉稳
-python ~/.claude/skills/mimo-voice/tts.py --list
+python3 ~/.claude/skills/mimo-voice/tts.py "文本" -o out.wav --play
+python3 ~/.claude/skills/mimo-voice/tts.py --file 长文本.txt -o out.wav
+python3 ~/.claude/skills/mimo-voice/tts.py "文本" --voice 苏打 --style 沉稳
+python3 ~/.claude/skills/mimo-voice/tts.py --list
 ```
 
 | 用户意图 | 做法 |
@@ -30,10 +32,10 @@ python ~/.claude/skills/mimo-voice/tts.py --list
 ## 语音输入（asr.py）
 
 ```bash
-python ~/.claude/skills/mimo-voice/asr.py                # 弹录音窗，说完按回车
-python ~/.claude/skills/mimo-voice/asr.py --seconds 8    # 定时录 8 秒（不弹窗）
-python ~/.claude/skills/mimo-voice/asr.py --file x.wav   # 转写已有音频
-python ~/.claude/skills/mimo-voice/asr.py --lang en      # zh/en/auto，默认 zh
+python3 ~/.claude/skills/mimo-voice/asr.py                # 弹录音窗，说完按回车
+python3 ~/.claude/skills/mimo-voice/asr.py --seconds 8    # 定时录 8 秒（不弹窗）
+python3 ~/.claude/skills/mimo-voice/asr.py --file x.wav   # 转写已有音频
+python3 ~/.claude/skills/mimo-voice/asr.py --lang en      # zh/en/auto，默认 zh
 ```
 
 | 用户意图 | 做法 |
@@ -61,6 +63,6 @@ python ~/.claude/skills/mimo-voice/asr.py --lang en      # zh/en/auto，默认 z
 |---|---|
 | 找不到 API Key | 运行 `setup.py`，或设 `MIMO_API_KEY` 环境变量 |
 | 401 | Key 错/网关不匹配，重跑 `setup.py` 第 5 步选对网关 |
-| 录音报缺 sounddevice | `pip install sounddevice` |
-| 播放没声音 | 检查 ffplay（Mac: brew install ffmpeg）；wav 仍会生成 |
+| 录音报缺 sounddevice / numpy | `pip install sounddevice numpy`（numpy 是 sounddevice 录音的隐式依赖） |
+| 播放没声音 | 装 ffmpeg（Mac: `brew install ffmpeg`，无 Homebrew 可 `pip install imageio-ffmpeg` 并软链其 ffmpeg）；wav 仍会生成 |
 | 控制台中文乱码 | 脚本已强制 UTF-8；仍乱码就 `PYTHONUTF8=1` |

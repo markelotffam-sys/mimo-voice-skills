@@ -66,5 +66,5 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 | 提示找不到 API Key | 运行 `setup.py`；或设环境变量 `MIMO_API_KEY` |
 | 401 认证失败 | Key 与网关不匹配：Token Plan 的 Key 要选 Token Plan 网关 |
 | 录音报缺 sounddevice / numpy | `pip install sounddevice numpy` |
-| 播放没声音但 wav 已生成 | 装 ffmpeg（Mac: `brew install ffmpeg`） |
+| 播放没声音但 wav 已生成 | 装 ffmpeg（Mac: `brew install ffmpeg`，无 Homebrew 可 `pip install imageio-ffmpeg` 后把其 ffmpeg 软链到 PATH） |
 | 中文乱码 | `PYTHONUTF8=1` 前缀运行；脚本已内置 UTF-8 修复 |
