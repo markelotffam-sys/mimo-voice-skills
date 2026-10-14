@@ -59,10 +59,9 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 
 语音文件统一在 `~/tts-output/`，自动三层清理：**3 天**过期 + 最多 **30 个** + 合计 **100MB** 封顶，无需手动维护。
 
-## 测试与复核
+## 兼容性
 
-- Mac 端测试指引与报告：[docs/mac-test.md](docs/mac-test.md)、[docs/mac-report.md](docs/mac-report.md)
-- Windows 端复核记录：`docs/win-report.md`（Windows 侧产出）
+已在 **macOS（Python 3.9）** 与 **Windows 11（Python 3.13 / PowerShell 5.1）** 双端实测通过：TTS / ASR / 听写弹窗 / 语音简报 / 播放 / 视频渲染全链路。
 
 ## FAQ
 
