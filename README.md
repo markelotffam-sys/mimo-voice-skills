@@ -51,7 +51,9 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 
 ## 可选：语音简报
 
-开启后 AI 每轮回答附带 ≤15 秒语音总结。默认关闭，启用方法见 [optional/voice-reply.md](optional/voice-reply.md)。
+开启后 AI 每轮回答附带 ≤15 秒语音总结。默认关闭，`setup.py` 第 8 步可一键开启，或见 [optional/voice-reply.md](optional/voice-reply.md)。
+
+> 实现为 SessionStart 会话级钩子：指令只在会话开始注入一次（进缓存前缀，每轮 token 开销≈0）；开关切换**下次会话生效**。
 
 ## 存储与清理
 

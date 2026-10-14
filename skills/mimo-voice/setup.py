@@ -135,13 +135,38 @@ def main():
     except Exception as e:
         print(f"  ⚠️ 自动写入失败（可手动添加）：{e}")
 
+    step(8, "可选：语音简报（每轮回答后自动语音总结）")
+    ans = input("  要开启语音简报吗？[y/N] ").strip().lower()
+    if ans in ("y", "yes"):
+        try:
+            settings = os.path.expanduser("~/.claude/settings.json")
+            conf = json.load(open(settings, encoding="utf-8")) if os.path.exists(settings) else {}
+            hooks = conf.setdefault("hooks", {})
+            sess = hooks.setdefault("SessionStart", [])
+            # SessionStart 只在会话开始注入一次指令（进缓存前缀），比逐轮注入省 token
+            hook_cmd = ("python " if sys.platform == "win32" else "python3 ") + (
+                "~/.claude/skills/mimo-voice/voice_reply_hook.py")
+            if not any(h.get("command") == hook_cmd
+                       for grp in sess for h in grp.get("hooks", [])):
+                sess.append({"hooks": [{"type": "command", "command": hook_cmd, "timeout": 10}]})
+                with open(settings, "w", encoding="utf-8") as f:
+                    json.dump(conf, f, ensure_ascii=False, indent=2)
+            os.makedirs(CONFIG_DIR, exist_ok=True)
+            open(os.path.join(CONFIG_DIR, "voice_reply.on"), "w").close()
+            print(f"  ✅ 已写入 SessionStart 钩子并开启开关：{hook_cmd}")
+            print("  （开关切换用 voice_reply_switch.py；改动下次会话生效）")
+        except Exception as e:
+            print(f"  ⚠️ 自动配置失败（可按 optional/voice-reply.md 手动配置）：{e}")
+    else:
+        print("  已跳过；以后要开见 optional/voice-reply.md")
+
     print("\n" + "=" * 56)
     print("  ✅ 配置完成！接下来安装 skill：")
     print("  1. 把 skills/ 下的两个文件夹复制到 ~/.claude/skills/")
     print("     cp -r skills/* ~/.claude/skills/")
     print("  2. 重启 Claude Code（或新开会话）")
     print("  3. 说「听」开始语音输入；说「读给我听」体验语音合成")
-    print("  可选：语音简报（每轮回答自动语音总结）见 optional/voice-reply.md")
+    print("  4. 语音简报管理：voice_reply_switch.py on/off/status（详见 optional/voice-reply.md）")
     print("=" * 56)
 
 
