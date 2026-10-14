@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python ~/.claude/skills/mimo-voice/voice_reply_hook.py",
+            "command": "python3 ~/.claude/skills/mimo-voice/voice_reply_hook.py",
             "timeout": 10
           }
         ]
@@ -28,7 +28,7 @@
 3. 开启开关（默认不开启，运行后才生效）：
 
 ```bash
-python ~/.claude/skills/mimo-voice/voice_reply_switch.py on
+python3 ~/.claude/skills/mimo-voice/voice_reply_switch.py on
 ```
 
 4. 重启 Claude Code 或在会话里敲一次 `/hooks` 重载配置。
@@ -36,9 +36,9 @@ python ~/.claude/skills/mimo-voice/voice_reply_switch.py on
 ## 关闭 / 切换
 
 ```bash
-python ~/.claude/skills/mimo-voice/voice_reply_switch.py off     # 关
-python ~/.claude/skills/mimo-voice/voice_reply_switch.py toggle  # 切换
-python ~/.claude/skills/mimo-voice/voice_reply_switch.py status  # 查看
+python3 ~/.claude/skills/mimo-voice/voice_reply_switch.py off     # 关
+python3 ~/.claude/skills/mimo-voice/voice_reply_switch.py toggle  # 切换
+python3 ~/.claude/skills/mimo-voice/voice_reply_switch.py status  # 查看
 ```
 
 开关关掉后钩子静默不注入，不用改 settings.json。
