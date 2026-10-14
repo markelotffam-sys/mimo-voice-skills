@@ -38,7 +38,7 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 # 3. 重启 Claude Code（或新开会话）
 ```
 
-依赖：Python ≥ 3.8；`sounddevice`（录音，setup.py 会装）；`ffplay` 或 `afplay`（播放，Mac 自带 afplay）。
+依赖：Python ≥ 3.8；`sounddevice` + `numpy`（录音，setup.py 会装）；`ffplay` 或 `afplay`（播放，Mac 自带 afplay）。
 
 ## 使用
 
@@ -65,6 +65,6 @@ python3 ~/.claude/skills/mimo-voice/setup.py
 |---|---|
 | 提示找不到 API Key | 运行 `setup.py`；或设环境变量 `MIMO_API_KEY` |
 | 401 认证失败 | Key 与网关不匹配：Token Plan 的 Key 要选 Token Plan 网关 |
-| 录音报缺 sounddevice | `pip install sounddevice` |
+| 录音报缺 sounddevice / numpy | `pip install sounddevice numpy` |
 | 播放没声音但 wav 已生成 | 装 ffmpeg（Mac: `brew install ffmpeg`） |
 | 中文乱码 | `PYTHONUTF8=1` 前缀运行；脚本已内置 UTF-8 修复 |

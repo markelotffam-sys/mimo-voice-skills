@@ -70,6 +70,11 @@ def _require_sounddevice():
         import sounddevice  # noqa: F401
     except ImportError:
         raise SystemExit("❌ 缺少录音依赖 sounddevice。请运行：pip install sounddevice")
+    try:
+        import numpy  # noqa: F401
+    except ImportError:
+        raise SystemExit(
+            "❌ 缺少 numpy（sounddevice 录音必需）。请运行：pip install numpy")
 
 
 def record_timed(seconds, path, samplerate=16000):

@@ -41,14 +41,18 @@ def main():
     if not ok:
         raise SystemExit("请升级 Python 后重试")
 
-    step(2, "检查录音依赖 sounddevice（语音输入需要，可选）")
-    try:
-        import sounddevice  # noqa: F401
-        print("  ✅ sounddevice 已安装")
-    except ImportError:
-        ans = input("  未安装 sounddevice，现在安装吗？[Y/n] ").strip().lower()
+    step(2, "检查录音依赖 sounddevice + numpy（语音输入需要，可选）")
+    missing = []
+    for mod in ("sounddevice", "numpy"):
+        try:
+            __import__(mod)
+            print(f"  ✅ {mod} 已安装")
+        except ImportError:
+            missing.append(mod)
+    if missing:
+        ans = input(f"  未安装 {'、'.join(missing)}，现在安装吗？[Y/n] ").strip().lower()
         if ans in ("", "y", "yes"):
-            subprocess.run([sys.executable, "-m", "pip", "install", "sounddevice"], check=False)
+            subprocess.run([sys.executable, "-m", "pip", "install", *missing], check=False)
         else:
             print("  ⚠️ 跳过：语音输入（录音）将不可用，语音合成不受影响")
 

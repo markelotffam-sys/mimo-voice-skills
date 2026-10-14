@@ -14,7 +14,7 @@
 ```bash
 git clone https://github.com/markelotffam-sys/mimo-voice-skills.git
 cp -r mimo-voice-skills/skills/* ~/.claude/skills/
-pip3 install sounddevice
+pip3 install sounddevice numpy
 ```
 
 依赖确认：`python3 --version` ≥ 3.8；播放用 Mac 自带 `afplay`（有 ffmpeg 更佳）。
