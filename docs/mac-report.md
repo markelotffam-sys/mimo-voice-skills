@@ -43,3 +43,4 @@
 
 另清理：视频模板死函数 `draw_item`（引用未定义 `item_appear`，被复制调用会 NameError）已删除；`mac-test.md` 写 Key 改 heredoc（避免 echo 进 shell 历史）；README / video-render SKILL.md 补 Pillow 依赖、imageio-ffmpeg 替代方案、macOS 字体回退说明。
 4. **播报命令免确认（已修）**：`tts.py --play` 每轮都弹权限确认（摘要文本每次不同，「总是允许」按命令文本匹配覆盖不到）。`setup.py` 新增第 7 步初始化时自动把 tts.py / voice_reply_switch.py 命令写入 `~/.claude/settings.json` 的 `permissions.allow`；`optional/voice-reply.md` 的配置示例同步带上 allow 块。
+5. **播放后残留加载核查（Mac 无此问题）**：Windows 端曾有播放结束后仍转圈的问题（PlaySync 阻塞，130e790 已修）。Mac 路径实测 `play()` 0.002s / 整命令 0.09s 返回（7.8s 音频后台继续播），端到端 `tts.py --play` 墙钟 = 纯合成耗时，不等播放。顺手加固 afplay：补上其他分支已有的 `stdout/stderr=DEVNULL` + `start_new_session=True`（避免个别环境下子进程持有管道导致命令等到播放结束）。

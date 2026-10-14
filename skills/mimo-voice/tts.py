@@ -110,7 +110,9 @@ def play(path):
             ["powershell", "-NoProfile", "-WindowStyle", "Hidden", "-Command", ps, path],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     elif platform.system() == "Darwin":
-        subprocess.Popen(["afplay", path])
+        subprocess.Popen(["afplay", path],
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         start_new_session=True)
     else:
         subprocess.Popen(["aplay", "-q", path],
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
