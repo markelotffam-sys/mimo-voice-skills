@@ -10,12 +10,12 @@
 ```json
 {
   "hooks": {
-    "UserPromptSubmit": [
+    "SessionStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/skills/mimo-voice/voice_reply_hook.py",  // Windows 上把 python3 换成 python（或 py -3），否则找不到命令
+            "command": "python3 ~/.claude/skills/mimo-voice/voice_reply_hook.py",  // Windows 上把 python3 换成 python（或 py -3）
             "timeout": 10
           }
         ]
@@ -32,7 +32,8 @@
 }
 ```
 
-> `permissions.allow` 是免确认白名单：没有它，每轮语音播报都会弹权限确认（摘要文本每次不同，「总是允许」也按命令文本匹配，覆盖不到下一条）。`setup.py` 第 7 步会自动写入这三条；手动配置时别漏掉。
+> **为什么是 SessionStart 而不是 UserPromptSubmit**：SessionStart 只在会话开始注入一次指令（进缓存前缀，此后每轮近乎零成本）；UserPromptSubmit 每轮注入 ~140 字，全部作为新输入计费，长会话多花 3000+ token。harness 级方案的代价：**开关中途切换，下次会话才生效**。
+> `permissions.allow` 是免确认白名单：没有它每轮播报都会弹权限确认。`setup.py` 第 7 步会自动写入；手动配置别漏。
 
 3. 开启开关（默认不开启，运行后才生效）：
 
@@ -51,4 +52,4 @@ python3 ~/.claude/skills/mimo-voice/voice_reply_switch.py status  # 查看
 # Windows：把 python3 换成 python（或 py -3）
 ```
 
-开关关掉后钩子静默不注入，不用改 settings.json。
+开关关掉后钩子静默不注入，不用改 settings.json；切换后**下次会话生效**。

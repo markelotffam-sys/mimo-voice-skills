@@ -51,3 +51,4 @@
    - **[中] `tts.py` 风格偏好失效**：`PRESETS.get(style or DEFAULT_STYLE, ...)` 使 config.json 的 `style` 偏好永远读不到；已改为先合并偏好再解析预设/自定义文案。
    - **[低] `setup.py` 第 6 步接不住 `SystemExit`**：`tts.synth` 的 API 报错是 SystemExit，`except Exception` 漏掉导致「常见原因」提示不展示；已改为 `except (Exception, SystemExit)`。
    其余全绿：无 eval/exec/shell=True/pickle；外联仅小米网关与 GitHub；全仓库与 git 历史无 Key/个人信息；7 个 .py 全部编译通过；文档与代码行为一致（双端对话框、python 命令名、依赖说明、密钥写入方式）。
+9. **语音简报改 harness 级钩子（性能优化）**：原 UserPromptSubmit 逐轮注入 ~140 字提醒（每轮都作为新输入计费，长会话固定多花数千 token）。改为 SessionStart 钩子：指令只在会话开始注入一次、进入缓存前缀，此后每轮近乎零成本。代价：开关（voice_reply_switch.py）中途切换时**下次会话生效**（脚本已提示）。hook 脚本与 settings.json 已迁移，voice-reply.md 已说明选型原因。Windows 端复核时请确认其本地做法并与本文档对齐。

@@ -42,3 +42,5 @@ elif cmd != "status":
     sys.exit(1)
 
 print(f"语音简报：{state()}")
+if cmd != "status":
+    print("（改动在下次会话生效——指令由 SessionStart 钩子注入，不再逐轮注入）")
