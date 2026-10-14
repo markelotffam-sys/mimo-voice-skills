@@ -3,7 +3,9 @@
 输出: frames/ 逐帧PNG + narration.wav + 时长信息
 然后由 ffmpeg 合成 MP4。
 """
+import json
 import os
+import platform
 import subprocess
 import wave
 
@@ -22,8 +24,16 @@ MUTED = (148, 163, 184)
 ACCENT = (86, 140, 255)      # 飞书蓝
 GOLD = (255, 203, 77)
 
-F_BOLD = "C:/Windows/Fonts/msyhbd.ttc"
-F_REG = "C:/Windows/Fonts/msyh.ttc"
+if platform.system() == "Darwin":
+    # macOS：优先苹方，旧系统回退华文黑体
+    F_BOLD = "/System/Library/Fonts/PingFang.ttc"
+    F_REG = "/System/Library/Fonts/PingFang.ttc"
+    if not os.path.exists(F_BOLD):
+        F_BOLD = "/System/Library/Fonts/STHeiti Medium.ttc"
+        F_REG = "/System/Library/Fonts/STHeiti Light.ttc"
+else:
+    F_BOLD = "C:/Windows/Fonts/msyhbd.ttc"
+    F_REG = "C:/Windows/Fonts/msyh.ttc"
 
 font_cache = {}
 def font(path, size):
